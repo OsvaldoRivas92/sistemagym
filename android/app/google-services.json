@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "201991430072",
+    "project_id": "gimnasio-46cdd",
+    "storage_bucket": "gimnasio-46cdd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:201991430072:android:b31865db7c1c9eba65394d",
+        "android_client_info": {
+          "package_name": "com.company.gimnasio"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuoNTmvdBQ5EENniHSzD_WQ8z1yV_ZPb0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
