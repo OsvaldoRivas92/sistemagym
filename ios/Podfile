@@ -37,7 +37,23 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
     
-    # 🔧 FIX para el error '-G' en Xcode 16
+    # Forzar configuración común para todos los targets
+    target.build_configurations.each do |config|
+      # Fijar versión mínima de iOS
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      
+      # Forzar C++17 para resolver errores de plantillas
+      config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
+      config.build_settings['CLANG_CXX_LIBRARY'] = 'libc++'
+      
+      # Añadir flags de compilación consistentes
+      config.build_settings['OTHER_CPLUSPLUSFLAGS'] = '$(inherited) -std=c++17'
+      
+      # Deshabilitar advertencias estrictas que puedan causar problemas
+      config.build_settings['GCC_WARN_INHIBIT_ALL_WARNINGS'] = 'YES'
+    end
+    
+    # 🔧 FIX específico para BoringSSL-GRPC (error -G)
     if target.name == 'BoringSSL-GRPC'
       target.source_build_phase.files.each do |file|
         if file.settings && file.settings['COMPILER_FLAGS']
@@ -45,6 +61,23 @@ post_install do |installer|
           flags.reject! { |flag| flag == '-G' || flag == '-GCC_WARN_INHIBIT_ALL_WARNINGS' }
           file.settings['COMPILER_FLAGS'] = flags.join(' ')
         end
+      end
+    end
+    
+    # 🔧 FIX adicional para gRPC-Core (error de plantillas)
+    if target.name == 'gRPC-Core' || target.name == 'gRPC-C++'
+      target.source_build_phase.files.each do |file|
+        if file.settings && file.settings['COMPILER_FLAGS']
+          flags = file.settings['COMPILER_FLAGS'].split
+          flags.delete('-std=c++14') # Reemplazar C++14 con C++17
+          file.settings['COMPILER_FLAGS'] = flags.join(' ')
+        end
+      end
+      
+      # Forzar C++17 específicamente para estos targets
+      target.build_configurations.each do |config|
+        config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
+        config.build_settings['OTHER_CPLUSPLUSFLAGS'] = '$(inherited) -std=c++17'
       end
     end
   end
